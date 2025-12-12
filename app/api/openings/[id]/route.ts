@@ -1,4 +1,4 @@
-// app/api/team-openings/[id]/route.ts
+// app/api/openings/[id]/route.ts
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
@@ -31,7 +31,6 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const { id } = await params
   const body = await req.json().catch(() => ({} as any))
 
-  // Ensure opening exists + current user owns the team
   const opening = await prisma.teamOpening.findUnique({
     where: { id },
     include: { team: true },
