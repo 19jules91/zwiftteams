@@ -1,0 +1,200 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// AUTH MODELS (NextAuth)
+//
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts Account[]
+  sessions Session[]
+
+  riderProfile   RiderProfile?
+  teams          Team[]
+  contactsFrom   ContactRequest[] @relation("FromUser")
+  contactsTo     ContactRequest[] @relation("ToUser")
+  messages       Message[]        // 👈 NEU, falls noch nicht vorhanden
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastActiveAt  DateTime?         // 👈 NEU
+}
+
+
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+//
+// RIDER PROFILE
+//
+
+model RiderProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName  String
+  nation       String?
+  mainCategory String
+  racingScore  Int?
+  searchStatus String
+
+  zwiftpowerLink  String?
+  zwiftracingLink String?
+
+  preferredLeagues String[]
+  preferredDays    String[]
+  preferredTime    String?
+  riderType        String?
+  discordHandle    String?
+  bio              String?
+
+  gender String? // "male" | "female" usw.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//
+// TEAM
+//
+
+model Team {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  name        String
+  nation      String?
+  description String?
+  discordLink String?
+  website     String?
+
+  leagues String[]
+  logoUrl String?
+
+  openings        TeamOpening[]
+  contactRequests ContactRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//
+// TEAM OPENINGS
+//
+
+model TeamOpening {
+  id          String   @id @default(cuid())
+  teamId      String
+  title       String
+  league      String?
+  category    String?
+  description String?
+  days        String[]
+  timezone    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  team         Team             @relation(fields: [teamId], references: [id])
+  applications ContactRequest[]
+}
+
+//
+// MESSAGES (Chat zur ContactRequest)
+//
+
+model Message {
+  id               String   @id @default(cuid())
+  contactRequestId String
+  senderId         String
+  text             String
+  createdAt        DateTime @default(now())
+  seenAt           DateTime?
+
+  contactRequest ContactRequest @relation("ContactRequestMessages", fields: [contactRequestId], references: [id])
+  sender         User           @relation(fields: [senderId], references: [id])
+}
+
+
+
+//
+// CONTACT REQUESTS (Applications)
+//
+
+model ContactRequest {
+  id          String   @id @default(cuid())
+  fromUserId  String
+  toUserId    String?
+  teamId      String?
+  openingId   String?
+  message     String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  fromUser User  @relation("FromUser", fields: [fromUserId], references: [id])
+  toUser   User? @relation("ToUser", fields: [toUserId], references: [id])
+  team     Team? @relation(fields: [teamId], references: [id])
+  opening  TeamOpening? @relation(fields: [openingId], references: [id])
+
+  messages Message[] @relation("ContactRequestMessages")
+}
+
+
+model TypingState {
+  id               String   @id @default(cuid())
+  contactRequestId String
+  userId           String
+  updatedAt        DateTime @updatedAt
+
+  @@unique([contactRequestId, userId])
+}

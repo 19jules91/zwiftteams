@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+@keyframes watopia-scroll {
+  0% {
+    background-position-x: 0%;
+  }
+  100% {
+    background-position-x: -100%;
+  }
+}
+
+.watopia-bg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: var(--zwift-bg-image);
+  background-repeat: repeat-x;
+  background-size: cover;
+  background-position-y: center;
+  animation: watopia-scroll 60s linear infinite;
+  filter: saturate(1.1);
+}
+
+.watopia-bg-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.6), transparent 55%),
+              linear-gradient(to bottom, #0f172a, #020617);
+  opacity: 0.85;
+}
+
+/* --- Generic page background helpers --- */
+
+.page-bg {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+/* dunkles Overlay, damit Text lesbar bleibt */
+.page-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Inhalt immer über dem Overlay */
+.page-content {
+  position: relative;
+  z-index: 1;
+}
