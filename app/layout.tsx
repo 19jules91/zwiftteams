@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import TickerBar from "@/components/TickerBar"
 
 export const metadata = {
   title: "ZwiftTeams",
@@ -26,9 +27,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     pendingInboxCount = await prisma.contactRequest.count({
       where: {
         status: "pending",
-        team: {
-          ownerId: userId,
-        },
+        team: { ownerId: userId },
       },
     })
   }
@@ -36,8 +35,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-slate-950 text-slate-100">
-        {/* HEADER */}
-        <header className="w-full border-b border-slate-800 bg-slate-900/95 shadow-sm shadow-slate-950/40">
+        {/* HEADER MIT BANNER + NAVIGATION */}
+        <header className="w-full border-b border-slate-800 bg-slate-950">
           {/* Bildbanner */}
           <div className="w-full overflow-hidden">
             <img
@@ -47,66 +46,32 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             />
           </div>
 
-          {/* Ticker */}
-          <div className="w-full bg-slate-950/95 py-2 text-[11px] text-slate-200">
-            <div className="mx-auto flex max-w-5xl items-center gap-6 overflow-hidden">
-              <div className="animate-marquee whitespace-nowrap">
-                <span className="mx-6">🏆 Allez Express recruited 2 new riders</span>
-                <span className="mx-6">🔥 New ZRL team openings available</span>
-                <span className="mx-6">🚴 Top Rider: Category A – 92 race score</span>
-                <span className="mx-6">🎯 {pendingInboxCount} open applications in Inbox</span>
-              </div>
-            </div>
-          </div>
+          {/* 🔥 Live Ticker */}
+          <TickerBar />
 
           {/* Navigation */}
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold tracking-wide text-slate-50">
-                ZwiftTeams
-              </span>
-              <span className="rounded-full bg-slate-800 px-2 py-[2px] text-[10px] text-slate-300">
-                beta
-              </span>
+            <div className="text-sm font-semibold tracking-wide text-slate-100">
+              ZwiftTeams
             </div>
 
             <nav className="flex items-center gap-4 text-xs font-medium text-slate-300">
-              <Link
-                href="/"
-                className="hover:text-white transition-colors"
-              >
+              <Link href="/" className="hover:text-white">
                 Home
               </Link>
-              <Link
-                href="/openings"
-                className="hover:text-white transition-colors"
-              >
+              <Link href="/openings" className="hover:text-white">
                 Openings
               </Link>
-              <Link
-                href="/teams"
-                className="hover:text-white transition-colors"
-              >
+              <Link href="/teams" className="hover:text-white">
                 Teams
               </Link>
-              <Link
-                href="/riders"
-                className="hover:text-white transition-colors"
-              >
+              <Link href="/riders" className="hover:text-white">
                 Riders
               </Link>
 
               <Link
-                href="/guide"
-                className="hover:text-white transition-colors"
-              >
-                Guide
-              </Link>
-
-              {/* Inbox mit Badge */}
-              <Link
                 href="/inbox"
-                className="flex items-center gap-1 hover:text-white transition-colors"
+                className="flex items-center gap-1 hover:text-white"
               >
                 <span>Inbox</span>
                 {pendingInboxCount > 0 && (
@@ -116,10 +81,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 )}
               </Link>
 
-              <Link
-                href="/account"
-                className="hover:text-white transition-colors"
-              >
+              <Link href="/guide" className="hover:text-white">
+                Guide
+              </Link>
+
+              <Link href="/account" className="hover:text-white">
                 Account
               </Link>
             </nav>
@@ -127,9 +93,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         </header>
 
         {/* PAGE CONTENT */}
-        <div className="min-h-[calc(100vh-220px)]">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   )
