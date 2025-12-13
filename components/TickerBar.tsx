@@ -53,7 +53,7 @@ export default async function TickerBar() {
   if (items.length === 0) {
     items.push({
       key: "empty",
-      node: <>👋 Welcome to ZWIFTTEAMS</>,
+      node: <>👋 Welcome to ZWIFTTEAMS!</>,
     })
   }
 
@@ -61,7 +61,7 @@ export default async function TickerBar() {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="flex w-max animate-marquee items-center gap-16 px-6 py-2 text-xs text-white/80">
+      <div className="flex w-max animate-marquee items-center gap-16 px-6 py-2 text-sm text-white/80">
         {loop.map((it, idx) => (
           <span key={`${it.key}-${idx}`} className="mx-6 inline-flex items-center">
             {it.node}

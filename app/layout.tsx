@@ -51,11 +51,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
           {/* Navigation */}
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <div className="text-sm font-semibold tracking-wide text-slate-100">
-              ZwiftTeams
+            <div className="text-sm semifont-semibold tracking-wide text-slate-100">
+              ZWIFTTEAMS
             </div>
 
-            <nav className="flex items-center gap-4 text-xs font-medium text-slate-300">
+            <nav className="flex items-center gap-3 text-sm font-bold text-slate-300">
               <Link href="/" className="hover:text-white">
                 Home
               </Link>
